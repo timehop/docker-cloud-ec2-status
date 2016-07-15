@@ -1,0 +1,18 @@
+machine:
+  services:
+    - docker
+
+dependencies:
+  override:
+    - docker run -v "$PWD":/go/src/github.com/vidsy/docker-cloud-ec2-status -w /go/src/github.com/vidsy/docker-cloud-ec2-status vidsyhq/go-builder
+
+test:
+  override:
+    - echo "No tests yet."
+
+deployment:
+  hub:
+    branch: master
+    commands:
+      - go get github.com/tcnksm/ghr
+      - ghr -t $GITHUB_TOKEN -u $CIRCLE_PROJECT_USERNAME -r $CIRCLE_PROJECT_REPONAME $(cat VERSION) ./docker-cloud-ec2-status
