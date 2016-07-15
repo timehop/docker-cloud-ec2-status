@@ -8,6 +8,10 @@ import (
 	"github.com/go-errors/errors"
 )
 
+const logLocation string = "/var/log/docker-cloud-ec2-status.log"
+
+type ()
+
 func main() {
 	defer func() {
 		if err := recover(); err != nil {
@@ -15,45 +19,20 @@ func main() {
 		}
 	}()
 
-	appEnv := appEnv()
-	dcAPIKey := dcAPIKey()
+	setupLogging()
 
-	log.Printf("Running on env: '%s'", appEnv)
-	log.Printf("Docker Cloud API key starts with: '%s...'", string(dcAPIKey[0:4]))
-	log.Print("Service starting...")
-
-	setupLogging(appEnv)
-
-	for {
-
+	config, err := NewConfig()
+	if err != nil {
+		log.Fatalf(err.Error())
 	}
+
+	poller := NewPoller(config)
+	poller.Start()
 }
 
-func appEnv() string {
-	if os.Getenv("APP_ENV") == "" {
-		return "development"
-	}
-	return os.Getenv("APP_ENV")
-}
-
-func dcAPIKey() string {
-	if os.Getenv("DC_API_KEY") == "" {
-		panic(
-			errors.New("'DC_API_KEY' env variable does not exist"),
-		)
-	}
-	return os.Getenv("DC_API_KEY")
-}
-
-func setupLogging(appEnv string) {
-	if appEnv == "development" {
-		return
-	}
-
-	location := "/var/log/docker-cloud-ec2-status.log"
-
+func setupLogging() {
 	fileHandler, err := os.OpenFile(
-		location, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666,
+		logLocation, os.O_APPEND|os.O_CREATE|os.O_RDWR, 0666,
 	)
 	if err != nil {
 		fmt.Printf("Error opening log file: %v", err)
