@@ -1,0 +1,6 @@
+hash: 32111bb39e713fa2c01618f62c62ef35bb5d8038c9273e52384215f50a4cce23
+updated: 2016-07-15T13:40:07.905621671+01:00
+imports:
+- name: github.com/go-errors/errors
+  version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
+devImports: []
