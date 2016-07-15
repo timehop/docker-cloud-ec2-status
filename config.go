@@ -13,7 +13,6 @@ const dockerCloudConfigLocation string = "/etc/dockercloud/agent/dockercloud-age
 type (
 	// Config comment pending
 	Config struct {
-		AppEnv              string
 		DockerCloudAPIKey   string
 		DockerCloudNodeUUID string
 	}
@@ -28,12 +27,6 @@ type (
 func NewConfig() (*Config, error) {
 	var config Config
 
-	appEnv, err := appEnv()
-	if err != nil {
-		return nil, err
-	}
-	log.Printf("Running on env: '%s'", appEnv)
-
 	dockerCloudAPIKey, err := dockerCloudAPIKey()
 	if err != nil {
 		return nil, err
@@ -43,14 +36,13 @@ func NewConfig() (*Config, error) {
 		string(dockerCloudAPIKey[0:4]),
 	)
 
-	dockerCloudNodeUUID, err := dockerCloudNodeUUID(appEnv)
+	dockerCloudNodeUUID, err := dockerCloudNodeUUID()
 	if err != nil {
 		errorMsg := fmt.Sprintf("Error when reading UUID from Docker Cloud config file: %s", err)
 		return nil, errors.New(errorMsg)
 	}
 	log.Printf("Docker Cloud node UUID: '%s'", dockerCloudNodeUUID)
 
-	config.AppEnv = appEnv
 	config.DockerCloudAPIKey = dockerCloudAPIKey
 	config.DockerCloudNodeUUID = dockerCloudNodeUUID
 
@@ -71,7 +63,7 @@ func dockerCloudAPIKey() (string, error) {
 	return os.Getenv("DC_API_KEY"), nil
 }
 
-func dockerCloudNodeUUID(appEnv string) (string, error) {
+func dockerCloudNodeUUID() (string, error) {
 	fileHandler, err := os.Open(dockerCloudConfigLocation)
 	if err != nil {
 		return "", err
