@@ -6,6 +6,16 @@
 
 ## Usage
 
+In **development**:
+
 ```
-# TODO
+go build && DC_USER=X DC_API_KEY=X DC_NODE_UUID=X ./docker-cloud-ec2-status
+```
+
+Environment variables:
+
+```
+- DC_USER      -> Docker Cloud username
+- DC_API_KEY   -> Docker Cloud API key
+- DC_NODE_UUID -> Any Docker Cloud node UUID
 ```

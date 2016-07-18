@@ -13,6 +13,7 @@ const dockerCloudConfigLocation string = "/etc/dockercloud/agent/dockercloud-age
 type (
 	// Config comment pending
 	Config struct {
+		DockerCloudUser     string
 		DockerCloudAPIKey   string
 		DockerCloudNodeUUID string
 	}
@@ -27,7 +28,13 @@ type (
 func NewConfig() (*Config, error) {
 	var config Config
 
-	dockerCloudAPIKey, err := dockerCloudAPIKey()
+	dockerCloudUser, err := fetchEnvVar("DC_USER")
+	if err != nil {
+		return nil, err
+	}
+	log.Printf("Docker Cloud user: '%s'", dockerCloudUser)
+
+	dockerCloudAPIKey, err := fetchEnvVar("DC_API_KEY")
 	if err != nil {
 		return nil, err
 	}
@@ -43,27 +50,18 @@ func NewConfig() (*Config, error) {
 	}
 	log.Printf("Docker Cloud node UUID: '%s'", dockerCloudNodeUUID)
 
+	config.DockerCloudUser = dockerCloudUser
 	config.DockerCloudAPIKey = dockerCloudAPIKey
 	config.DockerCloudNodeUUID = dockerCloudNodeUUID
 
 	return &config, nil
 }
 
-func appEnv() (string, error) {
-	if os.Getenv("APP_ENV") == "" {
-		return "", errors.New("'APP_ENV' env variable does not exist")
-	}
-	return os.Getenv("APP_ENV"), nil
-}
-
-func dockerCloudAPIKey() (string, error) {
-	if os.Getenv("DC_API_KEY") == "" {
-		return "", errors.New("'DC_API_KEY' env variable does not exist")
-	}
-	return os.Getenv("DC_API_KEY"), nil
-}
-
 func dockerCloudNodeUUID() (string, error) {
+	if os.Getenv("DC_NODE_UUID") != "" {
+		return os.Getenv("DC_NODE_UUID"), nil
+	}
+
 	fileHandler, err := os.Open(dockerCloudConfigLocation)
 	if err != nil {
 		return "", err
@@ -77,4 +75,12 @@ func dockerCloudNodeUUID() (string, error) {
 	}
 
 	return config.UUID, nil
+}
+
+func fetchEnvVar(key string) (string, error) {
+	if os.Getenv(key) == "" {
+		errorMsg := fmt.Sprintf("'%s' env variable does not exist", key)
+		return "", errors.New(errorMsg)
+	}
+	return os.Getenv(key), nil
 }

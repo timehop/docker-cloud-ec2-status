@@ -1,6 +1,12 @@
-hash: 32111bb39e713fa2c01618f62c62ef35bb5d8038c9273e52384215f50a4cce23
-updated: 2016-07-15T13:40:07.905621671+01:00
+hash: 22431d2881bc21ed09b033416dd4069d6caaf9e68d3944e868daf10c2c946f23
+updated: 2016-07-15T18:26:29.723534427+01:00
 imports:
+- name: github.com/docker/go-dockercloud
+  version: a7c28f4f0a9d569a0d42603d38eb3d2f1e80495b
+  subpackages:
+  - dockercloud
 - name: github.com/go-errors/errors
   version: a41850380601eeb43f4350f7d17c6bbd8944aaf8
+- name: github.com/gorilla/websocket
+  version: a836c37014dbbf0d1e871d04531b851fcbdeb22d
 devImports: []
